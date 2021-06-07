@@ -143,6 +143,6 @@ jobs:
 
       - name: Deploy to Kubernetes
         run: |
-          cd infrastructure/deployments/base
+          cd infrastructure/deployment
           ~/kustomize edit set image ${REGISTRY_NAME}/${IMAGE_NAME}:${SHA:0:8}
           ~/kustomize build | kubectl apply -f -
