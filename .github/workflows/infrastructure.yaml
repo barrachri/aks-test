@@ -1,0 +1,100 @@
+name: Continuous Integration
+
+on:
+  # When someone opens a Pull-Request.
+  pull_request:
+  # When a Pull-Request gets merged into Master.
+  push:
+    branches:
+      - master
+
+jobs:
+
+  infra-tests:
+    name: Terraform Tests
+    runs-on: ubuntu-latest
+
+    env:
+      # Terraform
+      TF_BACKEND_CONFIG: prefix=testing-aratrum
+      TF_VARS: testing.tfvars
+
+      # Azure auth for terraform 
+      # https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/guides/service_principal_client_secret#configuring-the-service-principal-in-terraform
+      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v2
+
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v1
+
+      - name: Validate Terraform Formatting
+        working-directory: infrastructure
+        run: |
+          terraform fmt --recursive -diff -check .
+
+      - name: Initialize Terraform
+        working-directory: infrastructure
+        run: |
+          terraform init -backend-config=$TF_BACKEND_CONFIG
+
+      - name: Validate Terraform files
+        working-directory: infrastructure
+        run: |
+          terraform validate
+
+      - name: Plan Terraform
+      # run this step only for pull-requests
+        if: github.ref != 'refs/heads/master'
+        working-directory: infrastructure
+        run: |
+          terraform plan -input=false -var-file=$TF_VARS
+
+  # ==========
+  # Deployment
+  # ==========
+
+  infra-setup:
+    name: Infrastructure Setup
+    runs-on: ubuntu-latest
+
+    # Only deploy Pull-Requests merged into Master.
+    if: github.ref == 'refs/heads/master'
+    needs:
+      - infra-tests
+
+    env:
+      # Terraform
+      TF_BACKEND_CONFIG: prefix=testing-aratrum
+      TF_VARS: testing.tfvars
+
+      # Azure auth for terraform 
+      # https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/guides/service_principal_client_secret#configuring-the-service-principal-in-terraform
+      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v2
+
+      - uses: hashicorp/setup-terraform@v1
+
+      - name: Initialize Terraform
+        working-directory: infrastructure
+        run: |
+          terraform init -backend-config=$TF_BACKEND_CONFIG
+
+      - name: Plan Terraform
+        working-directory: infrastructure
+        run: |
+          terraform plan -out=tfplan -input=false -var-file=$TF_VARS
+
+      - name: Apply Terraform
+        working-directory: infrastructure
+        run: |
+          terraform apply -input=false tfplan
