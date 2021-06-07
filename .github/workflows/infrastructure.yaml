@@ -16,8 +16,8 @@ jobs:
 
     env:
       # Terraform
-      TF_BACKEND_CONFIG: prefix=testing-aratrum
-      TF_VARS: testing.tfvars
+      TF_BACKEND_CONFIG: prefix=development-platform
+      TF_VARS: development.tfvars
 
       # Azure auth for terraform 
       # https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/guides/service_principal_client_secret#configuring-the-service-principal-in-terraform
@@ -69,8 +69,8 @@ jobs:
 
     env:
       # Terraform
-      TF_BACKEND_CONFIG: prefix=testing-aratrum
-      TF_VARS: testing.tfvars
+      TF_BACKEND_CONFIG: prefix=development-platform
+      TF_VARS: development.tfvars
 
       # Azure auth for terraform 
       # https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/guides/service_principal_client_secret#configuring-the-service-principal-in-terraform

@@ -23,7 +23,7 @@ jobs:
       SHA: ${{ github.sha }}
 
       # Docker
-      REGISTRY_NAME: PUT-YOUR-REGISTRY-NAME-HERE.azurecr.io
+      REGISTRY_NAME: ${{ secrets.REGISTRY_NAME }}
       IMAGE_NAME: ml-app
 
     steps:
@@ -38,19 +38,19 @@ jobs:
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - name: Pull latest image
-        run: docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}
+        run: docker pull ${REGISTRY_NAME}/${IMAGE_NAME}
         continue-on-error: true
 
       - name: Build new image
         run: |
           docker build --target base --build-arg GIT_HASH=${SHA:0:8} -t ${IMAGE_NAME} .
-          docker build --target tests -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${SHA:0:8}-tests .
+          docker build --target tests -t ${REGISTRY_NAME}/${IMAGE_NAME}:${SHA:0:8}-tests .
 
       - name: Push new image
         run: |
-          docker tag ${IMAGE_NAME} ${DOCKER_REGISTRY}/${IMAGE_NAME}:${SHA:0:8}
-          docker push ${DOCKER_REGISTRY}/${IMAGE_NAME}:${SHA:0:8}
-          docker push ${DOCKER_REGISTRY}/${IMAGE_NAME}:${SHA:0:8}-tests
+          docker tag ${IMAGE_NAME} ${REGISTRY_NAME}/${IMAGE_NAME}:${SHA:0:8}
+          docker push ${REGISTRY_NAME}/${IMAGE_NAME}:${SHA:0:8}
+          docker push ${REGISTRY_NAME}/${IMAGE_NAME}:${SHA:0:8}-tests
 
   # =====
   # Linters & Tests
@@ -67,7 +67,7 @@ jobs:
       SHA: ${{ github.sha }}
 
       # Docker
-      REGISTRY_NAME: PUT-YOUR-REGISTRY-NAME-HERE.azurecr.io
+      REGISTRY_NAME: ${{ secrets.REGISTRY_NAME }}
       IMAGE_NAME: ml-app
 
     steps:
@@ -82,8 +82,8 @@ jobs:
 
       - name: Pull Docker image
         run: |
-          docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:${SHA:0:8}-tests
-          docker tag ${DOCKER_REGISTRY}/${IMAGE_NAME}:${SHA:0:8}-tests ${IMAGE_NAME}
+          docker pull ${REGISTRY_NAME}/${IMAGE_NAME}:${SHA:0:8}-tests
+          docker tag ${REGISTRY_NAME}/${IMAGE_NAME}:${SHA:0:8}-tests ${IMAGE_NAME}
     
       - name: Run Isort
         run: |
@@ -121,15 +121,15 @@ jobs:
       SHA: ${{ github.sha }}
 
       # Docker
-      REGISTRY_NAME: PUT-YOUR-REGISTRY-NAME-HERE.azurecr.io
+      REGISTRY_NAME: ${{ secrets.REGISTRY_NAME }}
       IMAGE_NAME: ml-app
 
       # Kubernetes
       KUSTOMIZE_VERSION: 3.5.4
 
-      # Google Cloud
-      CLUSTER_NAME: europe-west1
-      CLUSTER_RESOURCE_GROUP: testing-k8s-cluster-bbcc
+      # Azure AKS Cluster
+      CLUSTER_NAME: ${{ secrets.CLUSTER_NAME }
+      CLUSTER_RESOURCE_GROUP: ${{ secrets.CLUSTER_RESOURCE_GROUP }
 
     steps:
       - name: Clone repository
@@ -159,5 +159,5 @@ jobs:
       - name: Deploy to Kubernetes
         run: |
           cd infrastructure/deployments/base
-          ~/kustomize edit set image ${DOCKER_REGISTRY}/${IMAGE_NAME}:${SHA:0:8}
+          ~/kustomize edit set image ${REGISTRY_NAME}/${IMAGE_NAME}:${SHA:0:8}
           ~/kustomize build | kubectl apply -f -
