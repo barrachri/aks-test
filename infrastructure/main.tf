@@ -5,6 +5,10 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "=2.60.0"
     }
+    azuread = {
+      source  = "hashicorp/azuread"
+      version = "=1.5.0"
+    }
   }
   backend "azurerm" {
     resource_group_name  = "infrastructure"
@@ -18,6 +22,12 @@ terraform {
 provider "azurerm" {
   features {}
 }
+
+provider "azuread" {
+  features {}
+}
+
+
 
 provider "kubernetes" {
   host                   = azurerm_kubernetes_cluster.ml_cluster.kube_config.0.host
