@@ -24,7 +24,6 @@ provider "azurerm" {
 }
 
 provider "azuread" {
-  features {}
 }
 
 
