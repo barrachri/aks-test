@@ -1,7 +1,7 @@
 # NOTE
 # Setup the Azure credentials inside Github Secrets
 # # Azure auth for terraform 
-# https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/guides/service_principal_client_secret#configuring-the-service-principal-in-terraform
+# https://registry.terraform.io/providers/hashicorp/azurerm/2.60.0/docs/guides/service_principal_client_secret#configuring-the-service-principal-in-terraform
 
 name: Continuous Integration Infrastructure
 
@@ -23,6 +23,7 @@ jobs:
       ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
       ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ ARM_SUBSCRIPTION_ID }}
 
     steps:
       - name: Clone repository
@@ -70,6 +71,7 @@ jobs:
       ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
       ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ ARM_SUBSCRIPTION_ID }}
 
     steps:
       - name: Clone repository
