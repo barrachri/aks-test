@@ -1,3 +1,8 @@
+# NOTE
+# Setup the Azure credentials inside Github Secrets
+# # Azure auth for terraform 
+# https://registry.terraform.io/providers/hashicorp/azurerm/2.60.0/docs/guides/service_principal_client_secret#configuring-the-service-principal-in-terraform
+
 name: Continuous Integration Infrastructure
 
 on:
@@ -15,15 +20,10 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      # Terraform
-      TF_BACKEND_CONFIG: prefix=development-platform
-      TF_VARS: development.tfvars
-
-      # Azure auth for terraform 
-      # https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/guides/service_principal_client_secret#configuring-the-service-principal-in-terraform
-      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
       ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
       ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
 
     steps:
       - name: Clone repository
@@ -40,7 +40,7 @@ jobs:
       - name: Initialize Terraform
         working-directory: infrastructure
         run: |
-          terraform init -backend-config=$TF_BACKEND_CONFIG
+          terraform init
 
       - name: Validate Terraform files
         working-directory: infrastructure
@@ -52,7 +52,7 @@ jobs:
         if: github.ref != 'refs/heads/master'
         working-directory: infrastructure
         run: |
-          terraform plan -input=false -var-file=$TF_VARS
+          terraform plan -input=false
 
   # ==========
   # Deployment
@@ -68,15 +68,10 @@ jobs:
       - infra-tests
 
     env:
-      # Terraform
-      TF_BACKEND_CONFIG: prefix=development-platform
-      TF_VARS: development.tfvars
-
-      # Azure auth for terraform 
-      # https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/guides/service_principal_client_secret#configuring-the-service-principal-in-terraform
-      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
       ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
       ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
 
     steps:
       - name: Clone repository
@@ -87,12 +82,12 @@ jobs:
       - name: Initialize Terraform
         working-directory: infrastructure
         run: |
-          terraform init -backend-config=$TF_BACKEND_CONFIG
+          terraform init
 
       - name: Plan Terraform
         working-directory: infrastructure
         run: |
-          terraform plan -out=tfplan -input=false -var-file=$TF_VARS
+          terraform plan -out=tfplan -input=false
 
       - name: Apply Terraform
         working-directory: infrastructure
