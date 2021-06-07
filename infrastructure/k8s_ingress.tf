@@ -1,4 +1,4 @@
-// The ingress needs at least one rule is to be deployed
+// The ingress needs at least one rule to be deployed
 // Uncomment this file and run terraform again once
 // the service has been deployed
 
