@@ -64,17 +64,17 @@ resource "azurerm_kubernetes_cluster" "ml_cluster" {
 
 // Give access to the AKS Cluster to use the Public IP
 resource "azurerm_role_assignment" "aks_cluster_network" {
-  scope                            = azurerm_resource_group.platform.id
-  role_definition_name             = "Network Contributor"
-  principal_id                     = azurerm_kubernetes_cluster.ml_cluster.identity[0].principal_id
+  scope                = azurerm_resource_group.platform.id
+  role_definition_name = "Network Contributor"
+  principal_id         = azurerm_kubernetes_cluster.ml_cluster.identity[0].principal_id
 }
 
 output "aks-cluster-name" {
-  value = azurerm_kubernetes_cluster.ml_cluster.name  
+  value = azurerm_kubernetes_cluster.ml_cluster.name
 }
 
 output "aks-cluster-group-name" {
-  value = azurerm_kubernetes_cluster.ml_cluster.resource_group_name  
+  value = azurerm_kubernetes_cluster.ml_cluster.resource_group_name
 }
 
 output "service-principal-id" {

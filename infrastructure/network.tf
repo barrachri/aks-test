@@ -23,5 +23,5 @@ resource "azurerm_public_ip" "lb-public-ip" {
 }
 
 output "aks-lb-public-ip" {
-  value = azurerm_public_ip.lb-public-ip.ip_address 
+  value = azurerm_public_ip.lb-public-ip.ip_address
 }

@@ -6,7 +6,7 @@ terraform {
       version = "=2.60.0"
     }
   }
-   backend "azurerm" {
+  backend "azurerm" {
     resource_group_name  = "infrastructure"
     storage_account_name = "filesforplatform"
     container_name       = "terraformstates"

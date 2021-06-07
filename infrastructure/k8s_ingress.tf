@@ -46,7 +46,7 @@ resource "helm_release" "nginx-ingress" {
     name  = "controller.replicaCount"
     value = 2
   }
-  
+
   set {
     name  = "controller.nodeSelector.beta\\.kubernetes\\.io/os"
     value = "linux"
@@ -66,7 +66,7 @@ resource "helm_release" "nginx-ingress" {
     name  = "controller.service.annotations.service\\.beta\\.kubernetes\\.io/azure-load-balancer-resource-group"
     value = azurerm_resource_group.platform.name
   }
-  
+
   set {
     name  = "controller.service.loadBalancerIP"
     value = azurerm_public_ip.lb-public-ip.ip_address
