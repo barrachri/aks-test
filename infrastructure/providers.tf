@@ -61,6 +61,7 @@ module "cluster" {
   environment         = var.environment
   location            = azurerm_resource_group.platform.location
   resource_group_name = azurerm_resource_group.platform.name
+  resource_group_id   = azurerm_resource_group.platform.id
   vnet_subnet_id      = azurerm_subnet.k8s_subnet.id
 }
 
@@ -75,6 +76,6 @@ module "cluster-config" {
   source                 = "./cluster-config"
   environment            = var.environment
   lb_public_ip           = azurerm_public_ip.lb-public-ip.ip_address
-  lb_resource_group_name = local.resource_group_name_platform
+  lb_resource_group_name = azurerm_resource_group.platform.name
   storage_secret         = local.storage_secret
 }

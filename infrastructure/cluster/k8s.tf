@@ -64,7 +64,7 @@ resource "azurerm_kubernetes_cluster" "ml_cluster" {
 
 // Give access to the AKS Cluster to use the Public IP
 resource "azurerm_role_assignment" "aks_cluster_network" {
-  scope                = var.vnet_subnet_id
+  scope                = var.resource_group_id
   role_definition_name = "Network Contributor"
   principal_id         = azurerm_kubernetes_cluster.ml_cluster.identity[0].principal_id
 }
