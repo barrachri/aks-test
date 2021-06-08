@@ -73,9 +73,10 @@ locals {
 }
 
 module "cluster-config" {
+  depends_on             = [module.cluster]
   source                 = "./cluster-config"
   environment            = var.environment
-  lb_public_ip           = azurerm_public_ip.lb-public-ip.ip_address
-  lb_resource_group_name = azurerm_resource_group.platform.name
+  lb_public_ip           = azurerm_public_ip.lb_public_ip.ip_address
+  lb_resource_group_name = local.resource_group_name_platform
   storage_secret         = local.storage_secret
 }
