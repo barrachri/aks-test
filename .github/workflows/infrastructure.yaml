@@ -1,0 +1,95 @@
+# NOTE
+# Setup the Azure credentials inside Github Secrets
+# # Azure auth for terraform 
+# https://registry.terraform.io/providers/hashicorp/azurerm/2.60.0/docs/guides/service_principal_client_secret#configuring-the-service-principal-in-terraform
+
+name: Continuous Integration Infrastructure
+
+on:
+  # When someone opens a Pull-Request.
+  pull_request:
+  # When a Pull-Request gets merged into Master.
+  push:
+    branches:
+      - master
+
+jobs:
+
+  infra-tests:
+    name: Terraform Tests
+    runs-on: ubuntu-latest
+
+    env:
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v2
+
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v1
+
+      - name: Validate Terraform Formatting
+        working-directory: infrastructure
+        run: |
+          terraform fmt --recursive -diff -check .
+
+      - name: Initialize Terraform
+        working-directory: infrastructure
+        run: |
+          terraform init
+
+      - name: Validate Terraform files
+        working-directory: infrastructure
+        run: |
+          terraform validate
+
+      - name: Plan Terraform
+      # run this step only for pull-requests
+        if: github.ref != 'refs/heads/master'
+        working-directory: infrastructure
+        run: |
+          terraform plan -input=false
+
+  # ==========
+  # Deployment
+  # ==========
+
+  infra-setup:
+    name: Infrastructure Setup
+    runs-on: ubuntu-latest
+
+    # Only deploy Pull-Requests merged into Master.
+    if: github.ref == 'refs/heads/master'
+    needs:
+      - infra-tests
+
+    env:
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v2
+
+      - uses: hashicorp/setup-terraform@v1
+
+      - name: Initialize Terraform
+        working-directory: infrastructure
+        run: |
+          terraform init
+
+      - name: Plan Terraform
+        working-directory: infrastructure
+        run: |
+          terraform plan -out=tfplan -input=false
+
+      - name: Apply Terraform
+        working-directory: infrastructure
+        run: |
+          terraform apply -input=false tfplan

@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ml-app
+  labels:
+    app: ml-app
+    team: ml-team
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ml-app
+  template:
+    metadata:
+      labels:
+        app: ml-app
+    spec:
+      securityContext:
+        runAsUser: 999
+      terminationGracePeriodSeconds: 100
+
+      containers:
+        - name: ml-app
+          image: <ADD-FULL-IMAGE-NAME-HERE>
+          imagePullPolicy: Always
+
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sleep", "10"]
+
+          args:
+            ["your", "command", "here"]
+            
+          resources:
+            requests:
+              memory: 256M
+              cpu: 0.1
+
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            timeoutSeconds: 20
+            failureThreshold: 5
+
+          readinessProbe:
+            httpGet:
+              path: /healthr
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 10
+            failureThreshold: 3
+          
+          # Azure Service Principal to
+          # get access to Azure Storage
+          env:
+            - name: AZURE_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: ml-app-secret
+                  key: AZURE_CLIENT_ID
+            - name: AZURE_TENANT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: ml-app-secret
+                  key: AZURE_TENANT_ID
+            - name: AZURE_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: ml-app-secret
+                  key: AZURE_CLIENT_SECRET
+
+          ports:
+            - containerPort: 8080
+          
