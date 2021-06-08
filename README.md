@@ -79,9 +79,9 @@ You can follow the [terraform documentation](https://registry.terraform.io/provi
 
 > NOTE
 
-The azure service principal for app CI/CD and infrastructure CI/CD should be different because they require different permissions.
+> The azure service principal for app CI/CD and infrastructure CI/CD should be different because they require different permissions.
 
-Ideally, the app CI/CD service principal should be partly defined as part of the infrastructure.
+> Ideally, the app CI/CD service principal should be defined as part of the infrastructure.
 
 ### Set-up infrastructure CI/CD
 

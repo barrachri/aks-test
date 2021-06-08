@@ -1,5 +1,5 @@
 variable "location" {
-  type    = string
+  type = string
 }
 
 variable "node_pool_vm" {
@@ -8,17 +8,17 @@ variable "node_pool_vm" {
 }
 
 variable "environment" {
-  type    = string
+  type = string
 }
 
 variable "cluster_name" {
-  type    = string
+  type = string
 }
 
 variable "resource_group_name" {
-  type    = string
+  type = string
 }
 
 variable "vnet_subnet_id" {
-  type    = string
+  type = string
 }

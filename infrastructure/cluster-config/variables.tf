@@ -1,15 +1,15 @@
 variable "environment" {
-  type    = string
+  type = string
 }
 
 variable "lb_resource_group_name" {
-  type    = string
+  type = string
 }
 
 variable "lb_public_ip" {
-  type    = string
+  type = string
 }
 
 variable "storage_secret" {
-  type    = map
+  type = map(any)
 }
